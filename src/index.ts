@@ -1,2 +1,1 @@
-
-export const MY_COMPONENT = 0;
+export { Diagram } from './Diagram'
