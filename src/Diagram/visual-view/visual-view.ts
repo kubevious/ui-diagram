@@ -204,9 +204,9 @@ export class VisualView {
             .on('click', () => {
                 let pt = this._svgElem.node().createSVGPoint();
                 // @ts-ignore: Unreachable code error
-                pt.x = d3.event.clientX;
+                pt.x = event.clientX;
                 // @ts-ignore: Unreachable code error
-                pt.y = d3.event.clientY;
+                pt.y = event.clientY;
                 const target = self._controlInfo.previewFullRectElem._groups[0][0];
                 const cursorpt = pt.matrixTransform(target.getScreenCTM().inverse());
 
@@ -219,9 +219,9 @@ export class VisualView {
                 d3.drag().on('drag', () => {
                     this._userPanTo(
                         // @ts-ignore: Unreachable code error
-                        this._viewPos.x + d3.event.dx / this._controlInfo.scale,
+                        this._viewPos.x + event.dx / this._controlInfo.scale,
                         // @ts-ignore: Unreachable code error
-                        this._viewPos.y + d3.event.dy / this._controlInfo.scale,
+                        this._viewPos.y + event.dy / this._controlInfo.scale,
                         true,
                     );
                 }),
@@ -302,9 +302,9 @@ export class VisualView {
         const drag = d3.drag().on('drag', () => {
             this._userPanTo(
                 // @ts-ignore: Unreachable code error
-                this._viewPos.x - d3.event.dx,
+                this._viewPos.x - event.dx,
                 // @ts-ignore: Unreachable code error
-                this._viewPos.y - d3.event.dy,
+                this._viewPos.y - event.dy,
                 true,
             );
         });
@@ -596,6 +596,7 @@ export class VisualView {
             .attr('y', (x) => x.y())
             .attr('width', (x) => x.width())
             .attr('height', (x) => x.height())
+            // @ts-ignore: Unreachable code error
             .on('click', nodePerformExpandCollapse);
     }
 

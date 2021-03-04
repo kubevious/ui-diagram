@@ -2,12 +2,14 @@ import _ from 'the-lodash';
 import { VisualNode } from './visual-node/visual-node';
 import { prettyKind as helperPrettyKind, FLAG_TOOLTIPS } from '@kubevious/helpers/dist/docs';
 
-export function nodePerformExpandCollapse(d: VisualNode): void {
+// _e - MouseEvent
+export function nodePerformExpandCollapse(_e: any, d: VisualNode): void {
     d.isExpanded = !d.isExpanded;
     d.view.updateAll();
 }
 
-export function nodePerformSelect(d: VisualNode): void {
+// _e - MouseEvent
+export function nodePerformSelect(_e: any, d: VisualNode): void {
     if (d.view) {
         d.view.handleVisualNodeClick(d);
     }
