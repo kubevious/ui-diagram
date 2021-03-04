@@ -13,8 +13,8 @@ describe('Diagram', () => {
     test('Should check that the component Diagram is rendered', async () => {
         const { findByTestId } = renderDiagram();
 
-        const copyClipboard = await findByTestId('diagram');
+        const diagram = await findByTestId('diagram');
 
-        expect(copyClipboard);
+        expect(diagram);
     });
 });
