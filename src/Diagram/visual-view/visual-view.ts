@@ -216,12 +216,10 @@ export class VisualView {
                 );
             })
             .call(
-                d3.drag().on('drag', () => {
+                d3.drag().on('drag', (d) => {
                     this._userPanTo(
-                        // @ts-ignore: Unreachable code error
-                        this._viewPos.x + event.dx / this._controlInfo.scale,
-                        // @ts-ignore: Unreachable code error
-                        this._viewPos.y + event.dy / this._controlInfo.scale,
+                        this._viewPos.x + d.dx / this._controlInfo.scale,
+                        this._viewPos.y + d.dy / this._controlInfo.scale,
                         true,
                     );
                 }),
@@ -299,12 +297,10 @@ export class VisualView {
     }
 
     _setupPanningByMouseDrag(): void {
-        const drag = d3.drag().on('drag', () => {
+        const drag = d3.drag().on('drag', (d) => {
             this._userPanTo(
-                // @ts-ignore: Unreachable code error
-                this._viewPos.x - event.dx,
-                // @ts-ignore: Unreachable code error
-                this._viewPos.y - event.dy,
+                this._viewPos.x - d.dx,
+                this._viewPos.y - d.dy,
                 true,
             );
         });
@@ -591,11 +587,11 @@ export class VisualView {
             .enter()
             .append('image')
             .attr('class', 'node-expander')
-            .attr('xlink:href', (x) => x.imgSrc)
-            .attr('x', (x) => x.x())
-            .attr('y', (x) => x.y())
-            .attr('width', (x) => x.width())
-            .attr('height', (x) => x.height())
+            .attr('xlink:href', (x: { imgSrc: any; }) => x.imgSrc)
+            .attr('x', (x: { x: () => any; }) => x.x())
+            .attr('y', (x: { y: () => any; }) => x.y())
+            .attr('width', (x: { width: () => any; }) => x.width())
+            .attr('height', (x: { height: () => any; }) => x.height())
             // @ts-ignore: Unreachable code error
             .on('click', nodePerformExpandCollapse);
     }
@@ -670,11 +666,11 @@ export class VisualView {
             .enter()
             .append('image')
             .attr('class', 'node-flag')
-            .attr('xlink:href', (x) => x.imgSrc)
-            .attr('x', (x) => x.x())
-            .attr('y', (x) => x.y())
-            .attr('width', (x) => x.width())
-            .attr('height', (x) => x.height())
+            .attr('xlink:href', (x: { imgSrc: any; }) => x.imgSrc)
+            .attr('x', (x: { x: () => any; }) => x.x())
+            .attr('y', (x: { y: () => any; }) => x.y())
+            .attr('width', (x: { width: () => any; }) => x.width())
+            .attr('height', (x: { height: () => any; }) => x.height())
             .on('mouseover', function (d: VisualNodeHeaderFlag) {
                 // @ts-ignore: Unreachable code error
                 self._showFlagTooltip(this, d.flag);
