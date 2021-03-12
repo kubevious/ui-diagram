@@ -586,8 +586,12 @@ export class VisualView {
                 .style('fill', (x) => x.fill)
                 .style('stroke', 'rgb(53, 55, 62)')
                 .style('stroke-width', '1')
-                .on('click', nodePerformSelect)
-                .on('dblclick', nodePerformExpandCollapse);
+                .on('click', (_e, d) => {
+                    nodePerformSelect(_e, d.node);
+                })
+                .on('dblclick', (_e, d) => {
+                    nodePerformExpandCollapse(_e, d.node);
+                });
         }
 
         {
@@ -608,8 +612,12 @@ export class VisualView {
                 .attr('class', 'node-severity-text')
                 .text((x) =>  x.text())
                 .attr('transform', (x) => x.transform())
-                .on('click', nodePerformSelect)
-                .on('dblclick', nodePerformExpandCollapse);
+                .on('click', (_e, d) => {
+                    nodePerformSelect(_e, d.node);
+                })
+                .on('dblclick', (_e, d) => {
+                    nodePerformExpandCollapse(_e, d.node);
+                });
         }
     }
 
