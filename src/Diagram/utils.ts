@@ -4,13 +4,13 @@ import { prettyKind as helperPrettyKind, FLAG_TOOLTIPS } from '@kubevious/helper
 import { FontSpec } from './types';
 
 // _e - MouseEvent
-export function nodePerformExpandCollapse(_e: any, d: any): void { // d: VisualNode
+export function nodePerformExpandCollapse(_e: any, d: VisualNode) {
     d.isExpanded = !d.isExpanded;
     d.view.updateAll();
 }
 
 // _e - MouseEvent
-export function nodePerformSelect(_e: any, d: any): void { //d: VisualNode
+export function nodePerformSelect(_e: any, d: VisualNode) { 
     if (d.view) {
         d.view.handleVisualNodeClick(d);
     }

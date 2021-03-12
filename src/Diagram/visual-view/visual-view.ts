@@ -959,7 +959,7 @@ export class VisualView {
         this._activatePanning();
     }
 
-    handleVisualNodeClick(visualNode: VisualNode): void {
+    handleVisualNodeClick(visualNode: VisualNode) {
         this.sharedState.set('auto_pan_to_selected_dn', false);
 
         if (visualNode.isSelected) {
