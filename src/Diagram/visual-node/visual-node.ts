@@ -1,6 +1,6 @@
 import _ from 'the-lodash';
 import { GrowingPacker } from '../packer.growing';
-import { prettyKind } from '../utils';
+import { measureText, prettyKind } from '../utils';
 import { MONTSERRAT_12PX_500, MONTSERRAT_10PX_500, MONTSERRAT_14PX_500 } from '../constants';
 import {
     NODE_RENDER_METADATA,
@@ -543,7 +543,7 @@ export class VisualNode {
             header.width = _.max(header.cells.map((x) => x.width));
             header.height = _.sumBy(header.cells, (x: Header) => x.height || 0);
         } else if (header.kind === 'text') {
-            const textDimentions = this._view._measureText(header.text, header.fontSpec);
+            const textDimentions = measureText(header.text, header.fontSpec);
             header.width = textDimentions.width;
             header.height = textDimentions.height;
         } else if (header.kind === 'icon') {

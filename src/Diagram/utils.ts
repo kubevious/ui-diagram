@@ -1,15 +1,16 @@
 import _ from 'the-lodash';
 import { VisualNode } from './visual-node/visual-node';
 import { prettyKind as helperPrettyKind, FLAG_TOOLTIPS } from '@kubevious/helpers/dist/docs';
+import { FontSpec } from './types';
 
 // _e - MouseEvent
-export function nodePerformExpandCollapse(_e: any, d: VisualNode): void {
+export function nodePerformExpandCollapse(_e: any, d: any): void { // d: VisualNode
     d.isExpanded = !d.isExpanded;
     d.view.updateAll();
 }
 
 // _e - MouseEvent
-export function nodePerformSelect(_e: any, d: VisualNode): void {
+export function nodePerformSelect(_e: any, d: any): void { //d: VisualNode
     if (d.view) {
         d.view.handleVisualNodeClick(d);
     }
@@ -130,3 +131,35 @@ export const prettyKind = (kind: string): string => {
     }
     return value;
 };
+
+
+export function measureText(
+    text: string | number | undefined,
+    fontSpec?: FontSpec,
+): {
+    width: number;
+    height: number;
+} {
+    if (!fontSpec) {
+        throw new Error('MISSING FONT SPEC');
+    }
+    text = _.isNil(text) ? '' : text ? text.toString() : '';
+
+    let totalWidth = 0;
+    const totalHeight = fontSpec.height;
+    for (let i = 0; i < text.length; i++) {
+        const code = text.charCodeAt(i);
+        const index = code - fontSpec.startCode;
+        let width: number;
+        if (index < 0 || index >= fontSpec.widths.length) {
+            width = fontSpec.defaultWidth;
+        } else {
+            width = fontSpec.widths[index];
+        }
+        totalWidth += width;
+    }
+    return {
+        width: totalWidth,
+        height: totalHeight,
+    };
+}

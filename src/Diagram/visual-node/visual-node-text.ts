@@ -6,12 +6,12 @@ export class VisualNodeText extends BaseVisualNodeHeader {
         super(node, headerName, flavor);
     }
 
-    text(): string | number | undefined {
+    text() {
         const header = this.header;
         if (!header) {
             // TODO: Error
             return '';
         }
-        return header.text;
+        return header.text || '';
     }
 }

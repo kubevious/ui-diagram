@@ -5,7 +5,7 @@ import 'bootstrap/js/dist/tooltip';
 
 import { VisualNode } from '../visual-node/visual-node';
 import { ViewPosition } from '../types';
-import { DiagramData, FontSpec } from '../types';
+import { DiagramData } from '../types';
 import { VisualNodeText } from '../visual-node/visual-node-text';
 import { VisualNodeHeaderMarker } from '../visual-node/visual-node-header-marker';
 import { VisualNodeHeaderFlag } from '../visual-node/visual-node-header-flag';
@@ -32,18 +32,19 @@ import {
     nodeHeaderText,
     nodeHeaderTransform,
 } from '../utils';
+import { VisualNodeSeverity } from '../visual-node/visual-node-severity';
 
 export class VisualView {
     private _parentElem: any; // Selection<BaseType, unknown, HTMLElement, any>
     private _width: number;
     private _height: number;
     private _viewPos: ViewPosition;
-    private _showRoot: boolean;
-    private _nodeDict: {};
-    private _currentSelectedNodeDn: string | null;
+    private _showRoot: boolean = true;
+    private _nodeDict: Record<string, VisualNode> = {};
+    private _currentSelectedNodeDn: string | null = null;
     private _controlInfo: any; // ControlInfo
     private _flatVisualNodes: VisualNode[];
-    private _existingNodeIds: {};
+    private _existingNodeIds: Record<string, boolean> = {};
     private _markerData: Record<string, any>;
     private _d3NodeDict: Record<string, VisualNode>;
     private _d3SmallNodeDict: {};
@@ -64,10 +65,6 @@ export class VisualView {
         this._height = 0;
 
         this._viewPos = { x: 0, y: 0 };
-
-        this._showRoot = true;
-        this._nodeDict = {};
-        this._currentSelectedNodeDn = null;
 
         this._controlInfo = {};
 
@@ -126,36 +123,6 @@ export class VisualView {
         this.sharedState.set('diagram_expanded_dns', dict);
     }
 
-    _measureText(
-        text: string | number | undefined,
-        fontSpec?: FontSpec,
-    ): {
-        width: number;
-        height: number;
-    } {
-        if (!fontSpec) {
-            throw new Error('MISSING FONT SPEC');
-        }
-        text = _.isNil(text) ? '' : text ? text.toString() : '';
-
-        let totalWidth = 0;
-        const totalHeight = fontSpec.height;
-        for (let i = 0; i < text.length; i++) {
-            const code = text.charCodeAt(i);
-            const index = code - fontSpec.startCode;
-            let width: number;
-            if (index < 0 || index >= fontSpec.widths.length) {
-                width = fontSpec.defaultWidth;
-            } else {
-                width = fontSpec.widths[index];
-            }
-            totalWidth += width;
-        }
-        return {
-            width: totalWidth,
-            height: totalHeight,
-        };
-    }
 
     skipShowRoot(): void {
         this._showRoot = false;
@@ -184,7 +151,7 @@ export class VisualView {
         this._setupPanning();
     }
 
-    _renderControl(): void {
+    private _renderControl(): void {
         const self = this;
         this._controlInfo.previewGroupElem = this._svgElem.append('g').attr('class', 'preview');
 
@@ -239,7 +206,7 @@ export class VisualView {
         }
     }
 
-    _setupControl(): void {
+    private _setupControl(): void {
         if (!this._visualRoot) {
             return;
         }
@@ -288,7 +255,7 @@ export class VisualView {
         }
     }
 
-    _setupPanning(): void {
+    private _setupPanning(): void {
         this._setupPanningByMouseDrag();
 
         this._setupPanningByWheel();
@@ -296,7 +263,7 @@ export class VisualView {
         this._applyPanTransform();
     }
 
-    _setupPanningByMouseDrag(): void {
+    private _setupPanningByMouseDrag(): void {
         const drag = d3.drag().on('drag', (d) => {
             this._userPanTo(
                 this._viewPos.x - d.dx,
@@ -308,7 +275,7 @@ export class VisualView {
         this._svgElem.call(drag);
     }
 
-    _setupPanningByWheel(): void {
+    private _setupPanningByWheel(): void {
         const doScroll = (e: WheelEvent) => {
             this._userPanTo(this._viewPos.x + e.deltaX, this._viewPos.y + e.deltaY, true);
             e.preventDefault();
@@ -320,7 +287,7 @@ export class VisualView {
         }
     }
 
-    _activatePanning(): void {
+    private _activatePanning(): void {
         if (!this.sharedState.get('auto_pan_to_selected_dn')) {
             return;
         }
@@ -336,12 +303,12 @@ export class VisualView {
         );
     }
 
-    _userPanTo(x: number, y: number, skipAnimate?: boolean) {
+    private _userPanTo(x: number, y: number, skipAnimate?: boolean) {
         this.sharedState.set('auto_pan_to_selected_dn', false);
         this._panTo(x, y, skipAnimate);
     }
 
-    _panTo(x: number, y: number, skipAnimate?: boolean) {
+    private _panTo(x: number, y: number, skipAnimate?: boolean) {
         const targetViewPos = this._fixViewPos({ x: x, y: y });
 
         if (skipAnimate) {
@@ -357,7 +324,7 @@ export class VisualView {
         }
     }
 
-    _animatePanTransform(): void {
+    private _animatePanTransform(): void {
         if (this._panAnimationTimer) {
             return;
         }
@@ -386,7 +353,7 @@ export class VisualView {
         }, 10);
     }
 
-    _stopPanAnimation(): void {
+    private _stopPanAnimation(): void {
         this._panInterpolator = null;
         this._panInterpolatorStartTime = null;
         this._panAnimationDuration = null;
@@ -396,7 +363,7 @@ export class VisualView {
         }
     }
 
-    _applyPanTransform(): void {
+    private _applyPanTransform(): void {
         if (!this._rootElem) {
             return;
         }
@@ -417,7 +384,7 @@ export class VisualView {
         this._setupControl();
     }
 
-    _fixViewPos(pos: ViewPosition): ViewPosition {
+    private _fixViewPos(pos: ViewPosition): ViewPosition {
         const newPos = { x: pos.x, y: pos.y };
 
         if (this._visualRoot) {
@@ -438,7 +405,7 @@ export class VisualView {
         this._setupControl();
     }
 
-    _packSourceData(root: DiagramData): VisualNode {
+    private _packSourceData(root: DiagramData): VisualNode {
         const recurse = (node: DiagramData, parent: VisualNode | null): VisualNode => {
             const visualNode = new VisualNode(this, node, parent);
             if (!node.children) {
@@ -455,7 +422,7 @@ export class VisualView {
         return recurse(root, null);
     }
 
-    _massageSourceData(): void {
+    private _massageSourceData(): void {
         if (!this._visualRoot) {
             return;
         }
@@ -477,11 +444,11 @@ export class VisualView {
         this._renderSmallItems();
     }
 
-    _renderSmallItems(): void {
+    private _renderSmallItems(): void {
         this._renderItemsSmall(this._controlInfo.previewItemsGroupElem, this._flatVisualNodes);
     }
 
-    _renderItems(parentNode: any, items: VisualNode[]): void {
+    private _renderItems(parentNode: any, items: VisualNode[]): void {
         const self = this;
         let node = parentNode
             .selectAll('.node') //selectAll('g')
@@ -571,13 +538,12 @@ export class VisualView {
         });
     }
 
-    _renderNodeExpander(visualNode: VisualNode) {
+    private _renderNodeExpander(visualNode: VisualNode) {
         const selection = d3
             // @ts-ignore: Unreachable code error
             .select(visualNode.node)
             .selectAll('.node-expander')
-            .data(visualNode.expanderNodes, function (x: any) {
-                //x: VisualNodeHeaderExpander
+            .data(visualNode.expanderNodes, (x: VisualNodeHeaderExpander) => {
                 return x.headerName;
             });
 
@@ -587,23 +553,22 @@ export class VisualView {
             .enter()
             .append('image')
             .attr('class', 'node-expander')
-            .attr('xlink:href', (x: { imgSrc: any; }) => x.imgSrc)
-            .attr('x', (x: { x: () => any; }) => x.x())
-            .attr('y', (x: { y: () => any; }) => x.y())
-            .attr('width', (x: { width: () => any; }) => x.width())
-            .attr('height', (x: { height: () => any; }) => x.height())
+            .attr('xlink:href', (x) => x.imgSrc)
+            .attr('x', (x) => x.x())
+            .attr('y', (x) => x.y())
+            .attr('width', (x) => x.width())
+            .attr('height', (x) => x.height())
             // @ts-ignore: Unreachable code error
             .on('click', nodePerformExpandCollapse);
     }
 
-    _renderNodeSeverity(visualNode: VisualNode): void {
+    private _renderNodeSeverity(visualNode: VisualNode): void {
         {
-            const selection: any = d3 // d3 type Selection <BaseType, VisualNodeSeverity, BaseType, unknown>
+            const selection = d3
                 // @ts-ignore: Unreachable code error
                 .select(visualNode.node)
                 .selectAll('.node-severity')
-                .data(visualNode.severityNodes, function (x: any) {
-                    //x: VisualNodeSeverity
+                .data(visualNode.severityNodes, function (x: VisualNodeSeverity) {
                     return x.headerName;
                 });
 
@@ -613,12 +578,12 @@ export class VisualView {
                 .enter()
                 .append('rect')
                 .attr('class', 'node-severity')
-                .attr('x', (x: { x: () => number }) => x.x())
-                .attr('y', (x: { y: () => number }) => x.y())
-                .attr('width', (x: { width: () => number }) => x.width())
-                .attr('height', (x: { height: () => number }) => x.height())
+                .attr('x', (x) => x.x())
+                .attr('y', (x) => x.y())
+                .attr('width', (x) => x.width())
+                .attr('height', (x) => x.height())
                 .attr('rx', 10)
-                .style('fill', (x: any[]) => x.fill)
+                .style('fill', (x) => x.fill)
                 .style('stroke', 'rgb(53, 55, 62)')
                 .style('stroke-width', '1')
                 .on('click', nodePerformSelect)
@@ -627,12 +592,11 @@ export class VisualView {
 
         {
             // eslint-disable-next-line no-redeclare
-            const selection: any = d3 //d3 type Selection <BaseType, VisualNodeText, BaseType, unknown>
+            const selection = d3
                 // @ts-ignore: Unreachable code error
                 .select(visualNode.node)
                 .selectAll('.node-severity-text')
-                .data(visualNode.severityTextNodes, function (x: any) {
-                    // x: VisualNodeText
+                .data(visualNode.severityTextNodes, function (x: VisualNodeText) {
                     return x.headerName;
                 });
 
@@ -642,8 +606,8 @@ export class VisualView {
                 .enter()
                 .append('text')
                 .attr('class', 'node-severity-text')
-                .text((x: VisualNodeText) => x.text())
-                .attr('transform', (x: VisualNodeText) => x.transform())
+                .text((x) =>  x.text())
+                .attr('transform', (x) => x.transform())
                 .on('click', nodePerformSelect)
                 .on('dblclick', nodePerformExpandCollapse);
         }
@@ -654,9 +618,8 @@ export class VisualView {
         const selection = d3
             // @ts-ignore: Unreachable code error
             .select(visualNode.node)
-            .selectAll('.node-flag')
-            .data(visualNode.flagNodes, (x : VisualNodeHeaderFlag) => {
-                // x: VisualNodeHeaderFlag
+            .selectAll<d3.BaseType, VisualNodeHeaderFlag>('.node-flag')
+            .data(visualNode.flagNodes, (x) => {
                 return x.headerName;
             });
 
@@ -671,26 +634,19 @@ export class VisualView {
             .attr('y', (x) => x.y())
             .attr('width', (x) => x.width())
             .attr('height', (x) => x.height())
-            // .attr('xlink:href', (x: { imgSrc: any; }) => x.imgSrc)
-            // .attr('x', (x: { x: () => any; }) => x.x())
-            // .attr('y', (x: { y: () => any; }) => x.y())
-            // .attr('width', (x: { width: () => any; }) => x.width())
-            // .attr('height', (x: { height: () => any; }) => x.height())
-
-            .on('mouseover', function (e: any, d) {
+            .on('mouseover', function (_e, d) {
                 // @ts-ignore: Unreachable code error
                 self._showFlagTooltip(this, d.flag);
             });
     }
 
-    _renderNodeMarkers(visualNode: VisualNode): void {
+    private _renderNodeMarkers(visualNode: VisualNode): void {
         const self = this;
         let selection = d3
             // @ts-ignore: Unreachable code error
             .select(visualNode.node)
-            .selectAll('.node-marker')
-            .data(visualNode.markerNodes, function (x: VisualNodeHeaderMarker) {
-                // x: VisualNodeHeaderMarker
+            .selectAll<d3.BaseType, VisualNodeHeaderMarker>('.node-marker')
+            .data(visualNode.markerNodes, function (x) {
                 return x.headerName;
             });
 
@@ -702,10 +658,9 @@ export class VisualView {
             .attr('class', 'node-marker')
             .attr('id', function (d) {
                 return d.node.id + d.headerName;
-                // return d.id;
             })
-            .attr('transform', (x: VisualNodeHeaderMarker) => x.transform())
-            .on('mouseover', function (e: any, d: VisualNodeHeaderMarker) {
+            .attr('transform', (x) => x.transform())
+            .on('mouseover', function (_e, d) {
                 // @ts-ignore: Unreachable code error
                 self._showMarkerTooltip(this, d.marker);
             });
@@ -730,17 +685,17 @@ export class VisualView {
             .html((x: VisualNodeHeaderMarker) => x.html());
     }
 
-    _showFlagTooltip(elem: VisualView, name: string): void {
+    private _showFlagTooltip(elem: VisualView, name: string): void {
         const descr = flagTooltip(name);
         this._showTooltip(elem, descr);
     }
 
-    _showMarkerTooltip(elem: VisualView, name: string): void {
+    private _showMarkerTooltip(elem: VisualView, name: string): void {
         const descr = 'Marker <b>' + name + '</b>';
         this._showTooltip(elem, descr);
     }
 
-    _showTooltip(elem: VisualView, descr: string): void {
+    private _showTooltip(elem: VisualView, descr: string): void {
         if (!descr) {
             return;
         }
@@ -775,61 +730,56 @@ export class VisualView {
 
         // @ts-ignore: Unreachable code error
         d3.select(visualNode.node)
-            .selectAll('.node-flag')
+            .selectAll<d3.BaseType, VisualNodeHeaderFlag>('.node-flag')
             .transition()
             .duration(duration)
-            .attr('x', (x: any) => {
-                // x: VisualNodeHeaderFlag
+            .attr('x', (x) => {
                 return x.x();
             })
-            .attr('y', (x: any) => x.y()); // x: VisualNodeHeaderFlag
+            .attr('y', (x) => x.y());
+
+        // @ts-ignore: Unreachable code error
+        d3.select(visualNode.node)
+            .selectAll<d3.BaseType, VisualNodeHeaderMarker>('.node-marker')
+            .transition()
+            .duration(duration)
+            .attr('transform', (x) => x.transform());
 
         // @ts-ignore: Unreachable code error
         d3.select(visualNode.node)
             .selectAll('.node-marker')
+            .selectAll<d3.BaseType, VisualNodeHeaderMarker>('.marker-text')
+            .html((x) => x.html())
             .transition()
             .duration(duration)
-            .attr('transform', (x: any) => x.transform()); // x: VisualNodeHeaderMarker
+            .attr('fill', (x) => x.fill()); 
 
         // @ts-ignore: Unreachable code error
         d3.select(visualNode.node)
-            .selectAll('.node-marker')
-            .selectAll('.marker-text')
-            .html((x: any) => x.html()) // x: VisualNodeHeaderMarker
+            .selectAll<d3.BaseType, VisualNodeSeverity>('.node-severity')
             .transition()
             .duration(duration)
-            .attr('fill', (x: any) => x.fill()); // x: VisualNodeHeaderMarker
-
-        // @ts-ignore: Unreachable code error
-        d3.select(visualNode.node)
-            .selectAll('.node-severity')
-            .transition()
-            .duration(duration)
-            .attr('x', function (x: any) {
-                // x: VisualNodeSeverity
+            .attr('x', function (x) {
                 return x.x();
             });
 
         // @ts-ignore: Unreachable code error
         d3.select(visualNode.node)
-            .selectAll('.node-severity-text')
-            .text((x: any) => {
-                // x: VisualNodeText
+            .selectAll<d3.BaseType, VisualNodeText>('.node-severity-text')
+            .text((x) => {
                 return x.text();
             })
             .transition()
             .duration(duration)
-            .attr('transform', (x: any) => {
-                // x: VisualNodeText
+            .attr('transform', (x) => {
                 return x.transform();
             });
 
         // @ts-ignore: Unreachable code error
-        d3.select(visualNode.node)
+        d3.select<d3.BaseType, VisualNode>(visualNode.node)
             .transition()
             .duration(duration)
-            .attr('class', function (d: any) {
-                // d: VisualNode
+            .attr('class', function (d) {
                 if (d.isSelected) {
                     return 'node selected';
                 }
@@ -838,7 +788,7 @@ export class VisualView {
             .attr('transform', nodeGroupTransform(visualNode));
 
         // @ts-ignore: Unreachable code error
-        d3.select(visualNode.node)
+        d3.select<d3.BaseType, VisualNode>(visualNode.node)
             .select('.node-bg')
             .transition()
             .duration(duration)
@@ -848,7 +798,7 @@ export class VisualView {
             .style('stroke', nodeStrokeColor(visualNode));
 
         // @ts-ignore: Unreachable code error
-        d3.select(visualNode.node)
+        d3.select<d3.BaseType, VisualNode>(visualNode.node)
             .select('.node-header')
             .transition()
             .duration(duration)
@@ -857,7 +807,7 @@ export class VisualView {
             .style('fill', nodeHeaderBgFillColor(visualNode));
 
         // @ts-ignore: Unreachable code error
-        d3.select(visualNode.node)
+        d3.select<d3.BaseType, VisualNode>(visualNode.node)
             .select('.node-header-hl')
             .transition()
             .duration(duration)
@@ -866,21 +816,19 @@ export class VisualView {
             .style('fill', nodeHeaderHlFillColor(visualNode));
 
         // @ts-ignore: Unreachable code error
-        d3.select(visualNode.node)
+        d3.select<d3.BaseType, VisualNode>(visualNode.node)
             .select('.node-expander')
             .transition()
             .duration(duration)
-            .attr('x', (x: any) => {
-                // x: VisualNodeHeaderExpander
-                const expanderNode = _.head<VisualNodeHeaderExpander>(x.expanderNodes);
+            .attr('x', (x) => {
+                const expanderNode = _.head(x.expanderNodes);
                 if (expanderNode) {
                     return expanderNode.x();
                 }
                 return 0;
             })
-            .attr('xlink:href', (x: any) => {
-                // x: VisualNodeHeaderExpander
-                const expanderNode = _.head<VisualNodeHeaderExpander>(x.expanderNodes);
+            .attr('xlink:href', (x) => {
+                const expanderNode = _.head(x.expanderNodes);
                 if (expanderNode) {
                     return expanderNode.imgSrc;
                 }
@@ -890,7 +838,7 @@ export class VisualView {
         this._updateNodeSmall(visualNode);
     }
 
-    _renderItemsSmall(parentNode: VisualNode, items: VisualNode[]): void {
+    private _renderItemsSmall(parentNode: VisualNode, items: VisualNode[]): void {
         const self = this;
         let node = parentNode
             // @ts-ignore: Unreachable code error
@@ -939,7 +887,7 @@ export class VisualView {
             .style('fill', nodeHeaderHlFillColor);
     }
 
-    _updateNodeSmall(visualNode: VisualNode): void {
+    private _updateNodeSmall(visualNode: VisualNode): void {
         const duration = 200;
 
         if (!visualNode.smallNode) {
@@ -951,38 +899,35 @@ export class VisualView {
             .duration(duration)
             .attr('transform', nodeGroupTransform(visualNode));
 
-        d3.select(visualNode.smallNode)
+        d3.select<d3.BaseType, VisualNode>(visualNode.smallNode)
             .select('.node-bg')
             .transition()
             .duration(duration)
-            .attr('width', function (d: any) {
-                // x: VisualNode
+            .attr('width', function (d) {
                 return d.width;
             })
-            .attr('height', function (d: any) {
-                // x: VisualNode
+            .attr('height', function (d) {
                 return d.height;
             });
 
-        d3.select(visualNode.smallNode)
+        d3.select<d3.BaseType, VisualNode>(visualNode.smallNode)
             .select('.node-header-hl')
             .transition()
             .duration(duration)
-            .attr('width', function (d: any) {
-                // x: VisualNode
+            .attr('width', function (d) {
                 return d.width;
             })
             .style('fill', nodeHeaderHlFillColor(visualNode));
     }
 
-    _updateNodeR(visualNode: VisualNode, isFullUpdate?: boolean): void {
+    private _updateNodeR(visualNode: VisualNode, isFullUpdate?: boolean): void {
         this._updateNode(visualNode, isFullUpdate);
         for (const child of visualNode.visibleChildren) {
             this._updateNodeR(child, isFullUpdate);
         }
     }
 
-    _updateSelection(selected_dn: string): void {
+    private _updateSelection(selected_dn: string): void {
         if (this._currentSelectedNodeDn && this._currentSelectedNodeDn !== selected_dn) {
             const node: VisualNode = this._nodeDict[this._currentSelectedNodeDn];
             this._currentSelectedNodeDn = null;
