@@ -655,7 +655,7 @@ export class VisualView {
             // @ts-ignore: Unreachable code error
             .select(visualNode.node)
             .selectAll('.node-flag')
-            .data(visualNode.flagNodes, function (x: any) {
+            .data(visualNode.flagNodes, (x : VisualNodeHeaderFlag) => {
                 // x: VisualNodeHeaderFlag
                 return x.headerName;
             });
@@ -666,12 +666,18 @@ export class VisualView {
             .enter()
             .append('image')
             .attr('class', 'node-flag')
-            .attr('xlink:href', (x: { imgSrc: any; }) => x.imgSrc)
-            .attr('x', (x: { x: () => any; }) => x.x())
-            .attr('y', (x: { y: () => any; }) => x.y())
-            .attr('width', (x: { width: () => any; }) => x.width())
-            .attr('height', (x: { height: () => any; }) => x.height())
-            .on('mouseover', function (d: VisualNodeHeaderFlag) {
+            .attr('xlink:href', (x) => x.imgSrc)
+            .attr('x', (x) => x.x())
+            .attr('y', (x) => x.y())
+            .attr('width', (x) => x.width())
+            .attr('height', (x) => x.height())
+            // .attr('xlink:href', (x: { imgSrc: any; }) => x.imgSrc)
+            // .attr('x', (x: { x: () => any; }) => x.x())
+            // .attr('y', (x: { y: () => any; }) => x.y())
+            // .attr('width', (x: { width: () => any; }) => x.width())
+            // .attr('height', (x: { height: () => any; }) => x.height())
+
+            .on('mouseover', function (e: any, d) {
                 // @ts-ignore: Unreachable code error
                 self._showFlagTooltip(this, d.flag);
             });
@@ -679,11 +685,11 @@ export class VisualView {
 
     _renderNodeMarkers(visualNode: VisualNode): void {
         const self = this;
-        let selection: any = d3 // d3 type Selection<d3.BaseType, VisualNodeHeaderMarker, d3.BaseType, unknown>
+        let selection = d3
             // @ts-ignore: Unreachable code error
             .select(visualNode.node)
             .selectAll('.node-marker')
-            .data(visualNode.markerNodes, function (x: any) {
+            .data(visualNode.markerNodes, function (x: VisualNodeHeaderMarker) {
                 // x: VisualNodeHeaderMarker
                 return x.headerName;
             });
@@ -694,11 +700,12 @@ export class VisualView {
             .enter()
             .append('g')
             .attr('class', 'node-marker')
-            .attr('id', function (d: VisualNode) {
-                return d.id;
+            .attr('id', function (d) {
+                return d.node.id + d.headerName;
+                // return d.id;
             })
             .attr('transform', (x: VisualNodeHeaderMarker) => x.transform())
-            .on('mouseover', function (d: VisualNodeHeaderMarker) {
+            .on('mouseover', function (e: any, d: VisualNodeHeaderMarker) {
                 // @ts-ignore: Unreachable code error
                 self._showMarkerTooltip(this, d.marker);
             });
