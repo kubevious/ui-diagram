@@ -7,12 +7,7 @@ import $ from 'jquery';
 import './styles.scss';
 import { DiagramData } from './types';
 
-import { IDiagramService } from '@kubevious/ui-middleware';
-
-const isTesting = process.env.IS_TESTING;
-
-
-export class Diagram extends ClassComponent<{}, {}, IDiagramService> {
+export class Diagram extends ClassComponent<{}, {}> {
     view: VisualView | null;
     private _sourceData: DiagramData | undefined;
     constructor(props: {} | Readonly<{}>) {
@@ -22,9 +17,7 @@ export class Diagram extends ClassComponent<{}, {}, IDiagramService> {
         // and in order not to receive errors,
         // we do not send the name of the service
         //
-        // isTesting ? undefined : { kind: 'diagram' }
-        //
-        super(props, null, isTesting ? undefined : { kind: 'diagram' });
+        super(props, null);
 
         this.view = null;
         this.subscribeToSharedState('diagram_data', (diagram_data: DiagramData) => {
