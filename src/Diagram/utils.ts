@@ -121,7 +121,7 @@ export const flagTooltip = (name: string): string => {
 };
 
 export function getNodeLogoUrl(kind: string): string {
-    return `/img/entities/${kind}.svg`;
+    return `../img/entities/${kind}.svg`;
 }
 
 export const prettyKind = (kind: string): string => {

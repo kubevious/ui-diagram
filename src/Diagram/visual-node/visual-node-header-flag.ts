@@ -19,6 +19,6 @@ export class VisualNodeHeaderFlag extends BaseVisualNodeHeader {
             // TODO: Error
             return '';
         }
-        return '/img/flags/' + header.icon + '.svg';
+        return '../../img/flags/' + header.icon + '.svg';
     }
 }
