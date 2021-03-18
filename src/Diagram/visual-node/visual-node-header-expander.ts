@@ -8,9 +8,9 @@ export class VisualNodeHeaderExpander extends BaseVisualNodeHeader {
 
     get imgSrc(): string {
         if (this.node.isExpanded) {
-            return '../../img/collapse.svg';
+            return '/img/collapse.svg';
         } else {
-            return '../../img/expand.svg';
+            return '/img/expand.svg';
         }
     }
 }
