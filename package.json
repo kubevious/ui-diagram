@@ -5,7 +5,9 @@
   "main": "dist/index.js",
   "types": "dist",
   "files": [
-    "dist/**/*"
+    "dist/**/*",
+    "public/**/*",
+    "scripts/**/*"
   ],
   "scripts": {
     "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' env IS_TESTING=true jest",
@@ -14,7 +16,8 @@
     "start": "rollup -c -w",
     "format": "prettier --write ./src/ ./test/",
     "format-check": "prettier --write ./src/ ./test/",
-    "lint": "eslint"
+    "lint": "eslint",
+    "postinstall": "./scripts/copy-public.sh"
   },
   "author": "Ruben Hakopian <ruben.hakopian@gmail.com>",
   "license": "Apache-2.0",
