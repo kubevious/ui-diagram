@@ -10,10 +10,10 @@ import { VisualNodeText } from '../visual-node/visual-node-text';
 import { VisualNodeHeaderMarker } from '../visual-node/visual-node-header-marker';
 import { VisualNodeHeaderFlag } from '../visual-node/visual-node-header-flag';
 import { ISharedState } from '@kubevious/ui-framework';
+import { getEntityImgUrl } from '@kubevious/ui-components/dist/DnIconComponent'
 import { VisualNodeHeaderExpander } from '../visual-node/visual-node-header-expander';
 import {
     flagTooltip,
-    getNodeLogoUrl,
     nodeGroupTransform,
     nodeWidth,
     nodeHeight,
@@ -507,7 +507,7 @@ export class VisualView {
             .attr('class', 'node-logo')
             .attr('xlink:href', function (d: VisualNode) {
                 // @ts-ignore: Unreachable code error
-                return getNodeLogoUrl(d.data.kind);
+                return getEntityImgUrl(d.data.kind);
             })
             .attr('x', nodeHeaderX('logo'))
             .attr('y', nodeHeaderY('logo'))

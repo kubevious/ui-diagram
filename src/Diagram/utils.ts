@@ -120,10 +120,6 @@ export const flagTooltip = (name: string): string => {
     return value;
 };
 
-export function getNodeLogoUrl(kind: string): string {
-    return `/img/entities/${kind}.svg`;
-}
-
 export const prettyKind = (kind: string): string => {
     let value = helperPrettyKind(kind);
     if (!value) {
