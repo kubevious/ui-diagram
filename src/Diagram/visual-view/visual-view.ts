@@ -10,7 +10,7 @@ import { VisualNodeText } from '../visual-node/visual-node-text';
 import { VisualNodeHeaderMarker } from '../visual-node/visual-node-header-marker';
 import { VisualNodeHeaderFlag } from '../visual-node/visual-node-header-flag';
 import { ISharedState } from '@kubevious/ui-framework';
-import { getEntityImgUrl } from '@kubevious/ui-components/dist/DnIconComponent'
+import { getEntityImgUrl } from '@kubevious/ui-components';
 import { VisualNodeHeaderExpander } from '../visual-node/visual-node-header-expander';
 import {
     flagTooltip,
