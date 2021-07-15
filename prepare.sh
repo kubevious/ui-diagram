@@ -6,8 +6,8 @@ cd $MY_DIR
 rm -rf node_modules/
 rm -rf dist/
 
-yarn
-
 ${MY_DIR}/update-dependencies.sh
+
+yarn
 
 ${MY_DIR}/build.sh
