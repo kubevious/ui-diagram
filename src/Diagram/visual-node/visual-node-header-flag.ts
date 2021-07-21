@@ -1,3 +1,4 @@
+import { FlagIconGetImageUrl } from '@kubevious/ui-components/dist';
 import { BaseVisualNodeHeader } from './base-visual-node-header';
 import { VisualNode } from './visual-node';
 
@@ -19,6 +20,6 @@ export class VisualNodeHeaderFlag extends BaseVisualNodeHeader {
             // TODO: Error
             return '';
         }
-        return '/img/flags/' + header.icon + '.svg';
+        return FlagIconGetImageUrl(header.icon!);
     }
 }
